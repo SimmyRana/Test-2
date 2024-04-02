@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: linear-gradient(rgba(117, 102, 165, 0.495), rgb(171, 185, 233), rgba(162, 127, 181, 0.62));
+}
+
+#weather-container {
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#city {
+   
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #292828;
+    margin-right: 10px;
+
+}
+
+
+#search-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#search-btn:hover {
+    background-color: #0056b3;
+}
+
+#weather-info {
+    background-color: rgba(200, 220, 218, 0.9);
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 2 0 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-top: 20px;
+    font-style: italic;
+}
+
+.weather-item {
+    margin-bottom: 20px;
+}
+
+    </style>
+</head>
+<body>
+    <div id="weather-container">
+        <h1>Weather App</h1>
+        <div>
+            <input type="text" id="city" placeholder="Enter city name">
+            <button id="search-btn" onclick="fetchWeatherData()">Search</button>
+        </div>
+        <div id="weather-info"></div>
+    </div>
+
+    <script>
+        function fetchWeatherData () {
+            const city = document.getElementById('city').value;
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?APPID=256602efd7915a05fea15561fbfa0ad0&q=${city}&units=metric`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch weather data');
+                    }
+                    return response.json();
+                })
+                .then(data => displayWeatherData(data))
+                .catch(error => {
+                    console.error(error.message);
+                    document.getElementById('weather-info').innerHTML = '<p>Failed to fetch weather data</p>';
+                });
+        };
+
+        function displayWeatherData(data) {
+            const weatherInfoDiv = document.getElementById('weather-info');
+            weatherInfoDiv.innerHTML = '';
+            
+            const cityName = data.name;
+            const weatherStatus = data.weather[0].description;
+            const humidity = data.main.humidity;
+            const temperature = data.main.temp;
+            const visibility = data.visibility;
+            const sunriseTimestamp = data.sys.sunrise * 1000; 
+            const sunsetTimestamp = data.sys.sunset * 1000; 
+            const sunriseTime = new Date(sunriseTimestamp).toLocaleTimeString();
+            const sunsetTime = new Date(sunsetTimestamp).toLocaleTimeString();
+
+
+
+            // Displaying weather information
+            const cityElement = document.createElement('div');
+            cityElement.innerHTML = `<strong>City:</strong> ${cityName}`;
+            weatherInfoDiv.appendChild(cityElement);
+
+            const weatherStatusElement = document.createElement('div');
+            weatherStatusElement.innerHTML = `<strong>Weather Status:</strong> ${weatherStatus}`;
+            weatherInfoDiv.appendChild(weatherStatusElement);
+
+            const humidityElement = document.createElement('div');
+            humidityElement.innerHTML = `<strong>Humidity:</strong> ${humidity}%`;
+            weatherInfoDiv.appendChild(humidityElement);
+
+            const temperatureElement = document.createElement('div');
+            temperatureElement.innerHTML = `<strong>Temperature:</strong> ${temperature}°C`;
+            weatherInfoDiv.appendChild(temperatureElement);
+
+            const visibilityElement = document.createElement('div');
+            visibilityElement.innerHTML = `<strong>Visibility:</strong> ${visibility} meters`;
+            weatherInfoDiv.appendChild(visibilityElement);
+
+            const sunriseElement = document.createElement('div');
+            sunriseElement.innerHTML = `<strong>Sunrise:</strong> ${sunriseTime}`;
+            weatherInfoDiv.appendChild(sunriseElement);
+
+            const sunsetElement = document.createElement('div');
+            sunsetElement.innerHTML = `<strong>Sunset:</strong> ${sunsetTime}`;
+            weatherInfoDiv.appendChild(sunsetElement);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes App</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #4b778d;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    
+    #notesContainer {
+      width: 90%;
+      max-width: 800px;
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 32px; 
+      color: #4b778d; 
+      margin-top: 10px; 
+      margin-bottom: 20px; 
+      text-align: center; 
+      font-family: 'Times New Roman', Times, serif;
+    }
+
+    #noteInput {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #3d3d3d;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    #addNoteBtn {
+      background-color: #245385;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #2b2b2b;
+    }
+
+    th {
+      background-color: #739aa2;
+      font-size: 18px;
+      color: #333;
+    }
+
+    td {
+      font-size: 16px;
+    }
+
+    .action-buttons button {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      color: #245385;
+      margin-right: 5px;
+    }
+
+    .action-buttons button:hover {
+      color: #4b778d;
+    }
+  </style>
+</head>
+<body>
+  <div id="notesContainer">
+    <h1>Notes</h1>
+    <input type="text" id="noteInput" placeholder="Enter your note">
+    <button id="addNoteBtn">Add Note</button>
+    <table id="notesTable">
+      <thead>
+        <tr>
+          <th>Serial No.</th>
+          <th>Note</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      displayNotes();
+    });
+
+    const addNoteBtn = document.getElementById('addNoteBtn');
+    const noteInput = document.getElementById('noteInput');
+    const notesTableBody = document.querySelector('#notesTable tbody');
+
+    addNoteBtn.addEventListener('click', addNote);
+
+    function addNote() {
+      const noteText = noteInput.value.trim();
+      if (noteText === '') {
+        alert('Please enter a note.');
+        return;
+      }
+
+      let notes = getNotes();
+      notes.push(noteText);
+      saveNotes(notes);
+      displayNotes();
+      noteInput.value = '';
+    }
+
+    function displayNotes() {
+      notesTableBody.innerHTML = ''; 
+
+      const notes = getNotes();
+
+      notes.forEach((note, index) => {
+        const row = notesTableBody.insertRow(); 
+        const cellIndex = row.insertCell(0); 
+        const cellNote = row.insertCell(1); 
+        const cellActions = row.insertCell(2); 
+
+        cellIndex.textContent = index + 1; 
+        cellNote.textContent = note; 
+
+        const editBtn = document.createElement('button');
+        editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+        editBtn.onclick = () => {
+          editNote(index);
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        deleteBtn.onclick = () => {
+          deleteNote(index);
+        };
+
+        cellActions.classList.add('action-buttons'); 
+        cellActions.appendChild(editBtn);
+        cellActions.appendChild(deleteBtn);
+      });
+    }
+
+    function editNote(index) {
+      const newNoteText = prompt('Enter the new note text:');
+      if (newNoteText !== null) {
+        let notes = getNotes();
+        notes[index] = newNoteText.trim();
+        saveNotes(notes);
+        displayNotes();
+      }
+    }
+
+    function deleteNote(index) {
+      if (confirm('Are you sure you want to delete this note?')) {
+        let notes = getNotes();
+        notes.splice(index, 1);
+        saveNotes(notes);
+        displayNotes();
+      }
+    }
+
+    function getNotes() {
+      return JSON.parse(localStorage.getItem('notes')) || [];
+    }
+
+    function saveNotes(notes) {
+      localStorage.setItem('notes', JSON.stringify(notes));
+    }
+  </script>
+</body>
+</html>
